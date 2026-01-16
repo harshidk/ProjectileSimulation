@@ -43,6 +43,15 @@ for i in range(len(velocities)):
             count+=1
     percents.append(count/len(distances) * 100)
 
+min = 100
+min_index = 0
+for i in range(len(percents)):
+    if percents[i] < min:
+        min = percents[i]
+        min_index = i
+
+print("Optimal velocity: " + str(velocities[min_index]))
+
 plt.scatter(np.array(velocities), np.array(percents))
 plt.xlabel("Velocities")
 plt.ylabel("Percent Missed")
