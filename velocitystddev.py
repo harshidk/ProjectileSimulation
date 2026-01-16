@@ -33,7 +33,7 @@ for i in range(len(velocities)):
     distances = []
     for vel in s:
         poses, vel = sim.simulateShotNoDrag(vel, [P_x, P_y, headings[i]], angles[i], launch_height)
-        dist, x, y = sim.findClosestPositionToTarget(poses, sim.TARGET_POSE)
+        dist, x, y = sim.findClosestPositionToTarget(poses, np.array(sim.TARGET_POSE))
         distances.append(dist)
     count = 0
     for d in distances:
