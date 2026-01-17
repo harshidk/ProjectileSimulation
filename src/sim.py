@@ -17,14 +17,14 @@ MIN_LAUNCH_SPEED = 1
 MAX_LAUNCH_SPEED = 20
 DELTA_V = 0.25
 
-OFFSET_X = 0.0
-OFFSET_Y = 0.4
-TARGET_POSE = (4.6255 + OFFSET_X, 4.034536 + OFFSET_Y, 1.4336494314+0.3) # (x, y, z) x is the long side of the field, z is the height
+OFFSET_X = 0.30
+OFFSET_Y = 0.0
+TARGET_POSE = (4.6255 + OFFSET_X, 4.034536 + OFFSET_Y, 1.4336494314+0.4) # (x, y, z) x is the long side of the field, z is the height
 LAUNCH_SPEED = 12
-TOLERANCE = 0.5
+TOLERANCE = 0.3
 
 
-HUB_PATH = "src/assets/hub.stl"
+HUB_PATH = "assets/hub.stl"
 
 """"
 launch_angle_z = 0 # radians
@@ -165,19 +165,29 @@ def findClosestPositionToTarget(pos, target_pos=np.array(TARGET_POSE)):
     return min_dist, closest_point, min_idx
 
 def findClosestZToTarget(pos, target_pos=np.array(TARGET_POSE)):
+    full_pos = pos
     pos = np.array_split(pos, 2)[1]
     z = target_pos[2]
     target_2d = np.array([target_pos[0], target_pos[1]])
 
-    min_idx = 0
-    min = 100000
-    for p in range(len(pos)):
-        if abs(pos[p][2] - z) < min:
-            min = abs(pos[p][2] - z)
-            min_idx = p
+    max = 0
+    for j in full_pos:
+        if j[2] > max:
+            max = j[2]
+            
+    if max > (z+0.3):
+        min_idx = 0
+        min = 100000
+        for p in range(len(pos)):
+            if abs(pos[p][2] - z) < min:
+                min = abs(pos[p][2] - z)
+                min_idx = p
 
-    dist = np.linalg.norm(np.array([pos[min_idx][0], pos[min_idx][1]]) - target_2d)
-    return dist, min_idx, min
+        dist = np.linalg.norm(np.array([pos[min_idx][0], pos[min_idx][1]]) - target_2d)
+        return dist, min_idx, min
+        
+    else:
+        return 5.0, 0.0, 0.0
 
 def calculateMinimumVelocity(target, position, launch_height):
     pos_2d = np.array([position[0], position[1]])
@@ -232,9 +242,9 @@ def meshcatVisualizeMultipleShots(positions, optimal_states, target):
         pos_x = float(positions[i][0])
         pos_y = float(positions[i][1])
         vis[f"projectile_{i}"].set_object(sphere, g.MeshLambertMaterial(color=0x00ff00))
-        vis[f"projectile_{i}"].set_transform(tf.translation_matrix([pos_y, pos_x, 0.5]))
+        vis[f"projectile_{i}"].set_transform(tf.translation_matrix([pos_x, pos_y, 0.5]))
 
-        p, v = simulateShotDrag(float(optimal_states[i][0][0]), [pos_y, pos_x, float(optimal_states[i][2])], float(optimal_states[i][0][1]), 0.5)
+        p, v = simulateShotDrag(float(optimal_states[i][0][0]), [pos_x, pos_y, float(optimal_states[i][1])], float(optimal_states[i][0][1]), 0.5)
         formatted_pose = np.zeros((3, len(p)), dtype=np.float32)
         for f in range(len(p)):
             formatted_pose[0, f] = p[f][0]

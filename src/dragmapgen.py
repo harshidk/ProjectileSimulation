@@ -14,10 +14,12 @@ vel_bnds = (1, 20)
 x_bnds = (0, 3.685794)
 y_bnds = (0, 8.069326)
 
-VEL_SAMPLES = 10
-ANGLE_SAMPLES = 10
+VEL_SAMPLES = 20
+ANGLE_SAMPLES = 20
 STDDEV_SAMPLES = 30
-POSITION_SAMPLES = 20
+POSITION_SAMPLES = 30
+
+MAX_HEIGHT = 3.6576
 
 def findBestShotNoSOTM(P_x, P_y):
     vels = []
@@ -32,7 +34,7 @@ def findBestShotNoSOTM(P_x, P_y):
             headings = sim.calculateRequiredHeading(sim.TARGET_POSE, [P_x, P_y, 0])
             poses, vel = sim.simulateShotDrag(velocities, [P_x, P_y, headings], angle, launch_height)
             dist, x, y = sim.findClosestZToTarget(poses, np.array(sim.TARGET_POSE))
-            if dist < sim.TOLERANCE:
+            if dist < sim.TOLERANCE and sim.getMaxHeight(poses) < MAX_HEIGHT:
                 vels.append(velocities)
                 angs.append(angle)
                 dists.append(dist)
@@ -61,8 +63,29 @@ def findBestShotNoSOTM(P_x, P_y):
         best_shot = [vels[max_index], angs[max_index]]
         return best_shot, heading, percents[max_index]
     else:
-        print("No valid shots found at position: " + str(P_x) + ", " + str(P_y))
+        # print("No valid shots found at position: " + str(P_x) + ", " + str(P_y))
         return [0,0], heading, 100.0
+
+def findBestShotAverageVelocityNoSOTM(P_x, P_y):
+    vels = []
+    angs = []
+    dists = []
+    avg_velocities = []
+    heading = sim.calculateRequiredHeading(sim.TARGET_POSE, [P_x, P_y, 0])
+
+    for i in range(VEL_SAMPLES):
+        velocities = float(((vel_bnds[1]- vel_bnds[0])/VEL_SAMPLES)*i + vel_bnds[0])
+        for j in range(ANGLE_SAMPLES):
+            angle = float(((angle_bnds[1] - angle_bnds[0])/ANGLE_SAMPLES)*j + angle_bnds[0])
+            headings = sim.calculateRequiredHeading(sim.TARGET_POSE, [P_x, P_y, 0])
+            poses, vel = sim.simulateShotDrag(velocities, [P_x, P_y, headings], angle, launch_height)
+            dist, x, y = sim.findClosestZToTarget(poses, np.array(sim.TARGET_POSE))
+            if dist < sim.TOLERANCE and sim.getMaxHeight(poses) < MAX_HEIGHT:
+                vels.append(velocities)
+                angs.append(angle)
+                dists.append(dist)
+    
+    pass
 
 def convertDataToDictionary(positions, shots, headings, probs):
     dict = {}

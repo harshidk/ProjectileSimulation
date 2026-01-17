@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from tqdm import tqdm
 import json
 
-FILE_NAME = 'src/data.json'
+FILE_NAME = 'data.json'
 dictionary = {}
 
 def convertKeyStringToTuple(key):
@@ -24,5 +24,5 @@ for k in keys:
         optimal_states.append(dictionary[k])
         tuple_keys.append(convertKeyStringToTuple(k))
 
-print(optimal_states)
-# sim.meshcatVisualizeMultipleShots(tuple_keys, optimal_states, sim.TARGET_POSE)
+# print(optimal_states)
+sim.meshcatVisualizeMultipleShots(tuple_keys, optimal_states, sim.TARGET_POSE)
