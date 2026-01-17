@@ -22,8 +22,8 @@ for i in range(int(v_samples)):
 max_heights = []
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(P_x, P_y, launch_height, s=50, color='g', label='Start')
-ax.scatter(sim.TARGET_POSE[0], sim.TARGET_POSE[1], sim.TARGET_POSE[2], s=50, color='r', label='Target')
+ax.scatter(P_x, P_y, launch_height, s=50, color='g', label='Start') # pyright: ignore[reportArgumentType]
+ax.scatter(sim.TARGET_POSE[0], sim.TARGET_POSE[1], sim.TARGET_POSE[2], s=50, color='r', label='Target') # pyright: ignore[reportArgumentType]
 for i in range(int(v_samples)):
     poses, vels = sim.simulateShotNoDrag(velocities[i], [P_x, P_y, headings[i]], angles[i], launch_height)
     poses_np = np.array(poses)
