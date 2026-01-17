@@ -63,7 +63,7 @@ def findBestShotNoSOTM(P_x, P_y):
 def convertDataToDictionary(positions, shots, headings, probs):
     dict = {}
     for i in range(len(positions)):
-        dict[positions[i]] = [shots[i], headings[i], probs[i]]
+        dict[f"{positions[i][0]},{positions[i][1]}"] = [shots[i], headings[i], probs[i]]
     return dict
 
 P_x = 0
