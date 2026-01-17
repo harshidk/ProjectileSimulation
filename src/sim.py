@@ -16,6 +16,8 @@ DT = 0.01
 MIN_LAUNCH_SPEED = 1
 MAX_LAUNCH_SPEED = 20
 DELTA_V = 0.25
+BACKSPIN_SPEED = 3 # rad/s counterclockwise
+Cl = 0.5
 
 OFFSET_X = 0.30
 OFFSET_Y = 0.0
@@ -43,8 +45,31 @@ def advanceNextStateDrag(v, p, dt):
     v_dir = v / np.linalg.norm(v)
     drag_mag = 0.5 * RHO * CSA * CD * (np.linalg.norm(v)**2)
     drag = -(drag_mag * v_dir) / M
+
     a_g = np.array([0, 0, -G])
     a = a_g + drag
+
+    v_new = v + a * dt
+    p_new = p + v * dt
+    return v_new, p_new
+
+def advanceNextStateDragLift(v, p, dt):
+    v_dir = v / np.linalg.norm(v)
+    drag_mag = 0.5 * RHO * CSA * CD * (np.linalg.norm(v)**2)
+    drag = -(drag_mag * v_dir) / M
+
+    drag_dir = -v_dir
+    i = [1, 0, 0]
+    lift_mag = Cl * (4/3)*(4 * np.pi ** 2 * R ** 3 * BACKSPIN_SPEED * RHO * np.linalg.norm(v))
+    lift_dir = np.cross(v_dir, i)/np.linalg.norm(np.cross(v_dir, i))
+
+    lift = lift_mag * lift_dir
+    print(lift_dir)
+    print(v_dir)
+    print(drag_dir)
+
+    a_g = np.array([0, 0, -G])
+    a = a_g + drag + lift
 
     v_new = v + a * dt
     p_new = p + v * dt
@@ -94,6 +119,30 @@ def simulateShotDrag(launch_vel, pose_2d, launch_angle_z, launch_height):
 
     while p[2] > 0:
         v, p = advanceNextStateDrag(v, p, DT)
+        pos.append(p)
+        vel.append(v)
+    return pos, vel
+
+def simulateShotDragLift(launch_vel, pose_2d, launch_angle_z, launch_height):
+    angle_rad_z = np.radians(launch_angle_z)
+    pose_2d_x = pose_2d[0]
+    pose_2d_y = pose_2d[1]
+    pos_2d_theta = np.radians(pose_2d[2])
+    v_z = launch_vel * np.sin(angle_rad_z)
+    v_x = launch_vel * np.cos(angle_rad_z) * np.cos(pos_2d_theta)
+    v_y = launch_vel * np.cos(angle_rad_z) * np.sin(pos_2d_theta)
+    v = np.array([v_x, v_y, v_z])
+    
+    pos = []
+    vel = []
+
+    pos.append(np.array([pose_2d_x, pose_2d_y, launch_height]))
+    vel.append(v)
+
+    p = np.array([pose_2d_x, pose_2d_y, launch_height])
+
+    while p[2] > 0:
+        v, p = advanceNextStateDragLift(v, p, DT)
         pos.append(p)
         vel.append(v)
     return pos, vel
@@ -287,6 +336,19 @@ def getAveragePathVelocity(vel):
         total += np.linalg.norm(v)
     return total / len(vel)
 # meshcatVisualizeHub(TARGET_POSE)
+P_x = 6
+P_y = 6
+launch_height = 0.5
+
+v_min = calculateMinimumVelocity(TARGET_POSE, [P_x, P_y, 0], launch_height) + 0.05
+
+heading, angle, dist, sqrt_term, y_d = calculateOptimalTrajectoriesNoDrag(TARGET_POSE, [P_x, P_y, launch_height], v_min)
+pos, vel = simulateShotDrag(v_min, [P_x, P_y, heading], angle, launch_height)
+
+print(findClosestPositionToTarget(pos))
+
+graphSimulatedShot(pos, TARGET_POSE)
+
 
 """
 THIS IS AN EXAMPLE OF MESHCAT VISUALIZATION
