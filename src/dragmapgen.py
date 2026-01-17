@@ -86,13 +86,16 @@ def findBestShotAverageVelocityNoSOTM(P_x, P_y):
                 angs.append(angle)
                 dists.append(dist)
                 avg_velocities.append(avg_vel)
-    m = 0
-    max_index = 0
-    for k in range(len(vels)):
-        if avg_velocities[k] > m:
-            m = avg_velocities[k]
-            max_index = k
-    return [vels[max_index], angs[max_index]], heading, m
+    if len(vels) != 0:
+        m = 0
+        max_index = 0
+        for k in range(len(vels)):
+            if avg_velocities[k] > m:
+                m = avg_velocities[k]
+                max_index = k
+        return [vels[max_index], angs[max_index]], heading, m
+    else:
+        return [0,0], heading, 100.0
 
 def convertDataToDictionary(positions, shots, headings, probs):
     dict = {}
