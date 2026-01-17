@@ -336,6 +336,7 @@ def getAveragePathVelocity(vel):
         total += np.linalg.norm(v)
     return total / len(vel)
 # meshcatVisualizeHub(TARGET_POSE)
+"""
 P_x = 6
 P_y = 6
 launch_height = 0.5
@@ -348,7 +349,7 @@ pos, vel = simulateShotDrag(v_min, [P_x, P_y, heading], angle, launch_height)
 print(findClosestPositionToTarget(pos))
 
 graphSimulatedShot(pos, TARGET_POSE)
-
+"""
 
 """
 THIS IS AN EXAMPLE OF MESHCAT VISUALIZATION
