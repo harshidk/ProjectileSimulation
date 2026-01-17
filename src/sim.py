@@ -13,6 +13,7 @@ R = 0.15
 CSA = np.pi * R**2
 M = 0.203 # to 0.227
 DT = 0.001
+MIN_LAUNCH_SPEED = 1
 MAX_LAUNCH_SPEED = 20
 DELTA_V = 0.25
 
@@ -20,7 +21,7 @@ TARGET_POSE = (4.6255, 4.034536, 1.4336494314+0.2) # (x, y, z) x is the long sid
 LAUNCH_SPEED = 12
 TOLERANCE = 0.5
 
-HUB_PATH = "assets/hub.stl"
+HUB_PATH = "src/assets/hub.stl"
 
 """"
 launch_angle_z = 0 # radians
@@ -149,12 +150,31 @@ def calculateOptimalTrajectoriesNoDrag(target, position, launch_vel):
     chosen_theta = max(theta1, theta2)
     return heading, chosen_theta, dist, sqrt_term, y_d
 
+def calculateRequiredHeading(target, position):
+    heading = np.degrees(np.arctan2(target[1] - position[1], target[0] - position[0]))
+    return heading
+
 def findClosestPositionToTarget(pos, target_pos=np.array(TARGET_POSE)):
     dists = np.linalg.norm(np.array(pos) - target_pos, axis=1)
     min_idx = np.argmin(dists)
     min_dist = dists[min_idx]
     closest_point = pos[min_idx]
     return min_dist, closest_point, min_idx
+
+def findClosestZToTarget(pos, target_pos=np.array(TARGET_POSE)):
+    pos = np.array_split(pos, 2)[1]
+    z = target_pos[2]
+    target_2d = np.array([target_pos[0], target_pos[1]])
+
+    min_idx = 0
+    min = 100000
+    for p in range(len(pos)):
+        if abs(pos[p][2] - z) < min:
+            min = abs(pos[p][2] - z)
+            min_idx = p
+
+    dist = np.linalg.norm(np.array([pos[min_idx][0], pos[min_idx][1]]) - target_2d)
+    return dist, min_idx, min
 
 def calculateMinimumVelocity(target, position, launch_height):
     pos_2d = np.array([position[0], position[1]])
