@@ -35,6 +35,17 @@ def advanceNextStateNoDrag(v, p, dt):
     p_new = p + v_new * dt
     return v_new, p_new
 
+def advanceNextStateDrag(v, p, dt):
+    v_dir = v / np.linalg.norm(v)
+    drag_mag = 0.5 * RHO * CSA * CD * (np.linalg.norm(v)**2)
+    drag = -(drag_mag * v_dir) / M
+    a_g = np.array([0, 0, -G])
+    a = a_g + drag
+
+    v_new = v + a * dt
+    p_new = p + v * dt
+    return v_new, p_new
+
 def simulateShotNoDrag(launch_vel, pose_2d, launch_angle_z, launch_height):
     angle_rad_z = np.radians(launch_angle_z)
     pose_2d_x = pose_2d[0]
@@ -55,6 +66,30 @@ def simulateShotNoDrag(launch_vel, pose_2d, launch_angle_z, launch_height):
 
     while p[2] > 0:
         v, p = advanceNextStateNoDrag(v, p, DT)
+        pos.append(p)
+        vel.append(v)
+    return pos, vel
+
+def simulateShotDrag(launch_vel, pose_2d, launch_angle_z, launch_height):
+    angle_rad_z = np.radians(launch_angle_z)
+    pose_2d_x = pose_2d[0]
+    pose_2d_y = pose_2d[1]
+    pos_2d_theta = np.radians(pose_2d[2])
+    v_z = launch_vel * np.sin(angle_rad_z)
+    v_x = launch_vel * np.cos(angle_rad_z) * np.cos(pos_2d_theta)
+    v_y = launch_vel * np.cos(angle_rad_z) * np.sin(pos_2d_theta)
+    v = np.array([v_x, v_y, v_z])
+    
+    pos = []
+    vel = []
+
+    pos.append(np.array([pose_2d_x, pose_2d_y, launch_height]))
+    vel.append(v)
+
+    p = np.array([pose_2d_x, pose_2d_y, launch_height])
+
+    while p[2] > 0:
+        v, p = advanceNextStateDrag(v, p, DT)
         pos.append(p)
         vel.append(v)
     return pos, vel
