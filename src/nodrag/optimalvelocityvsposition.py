@@ -1,5 +1,5 @@
 import numpy as np
-import sim
+from .. import sim
 import matplotlib.pyplot as plt
 
 launch_height = 0.5

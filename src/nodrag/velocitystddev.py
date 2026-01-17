@@ -1,5 +1,5 @@
 import numpy as np
-import sim
+from .. import sim
 import matplotlib.pyplot as plt
 
 P_x = 6

@@ -1,4 +1,4 @@
-import sim
+from .. import sim
 import matplotlib.pyplot as plt
 import numpy as np
 
