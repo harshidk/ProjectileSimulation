@@ -78,14 +78,21 @@ def findBestShotAverageVelocityNoSOTM(P_x, P_y):
         for j in range(ANGLE_SAMPLES):
             angle = float(((angle_bnds[1] - angle_bnds[0])/ANGLE_SAMPLES)*j + angle_bnds[0])
             headings = sim.calculateRequiredHeading(sim.TARGET_POSE, [P_x, P_y, 0])
-            poses, vel = sim.simulateShotDrag(velocities, [P_x, P_y, headings], angle, launch_height)
+            poses, e = sim.simulateShotDrag(velocities, [P_x, P_y, headings], angle, launch_height)
+            avg_vel = sim.getAveragePathVelocity(e)
             dist, x, y = sim.findClosestZToTarget(poses, np.array(sim.TARGET_POSE))
             if dist < sim.TOLERANCE and sim.getMaxHeight(poses) < MAX_HEIGHT:
                 vels.append(velocities)
                 angs.append(angle)
                 dists.append(dist)
-    
-    pass
+                avg_velocities.append(avg_vel)
+    m = 0
+    max_index = 0
+    for k in range(len(vels)):
+        if avg_velocities[k] > m:
+            m = avg_velocities[k]
+            max_index = k
+    return [vels[max_index], angs[max_index]], heading, m
 
 def convertDataToDictionary(positions, shots, headings, probs):
     dict = {}
@@ -107,7 +114,7 @@ for o in tqdm(range(POSITION_SAMPLES)):
         P_y = ((y_bnds[1] - y_bnds[0])/POSITION_SAMPLES)*e + y_bnds[0]
         p = (P_x, P_y)
         positions.append(p)
-        shot, heading, prob = findBestShotNoSOTM(P_x, P_y)
+        shot, heading, prob = findBestShotAverageVelocityNoSOTM(P_x, P_y)
         shots.append(shot)
         headings.append(heading)
         probs.append(prob)
