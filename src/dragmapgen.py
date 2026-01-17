@@ -2,6 +2,8 @@ import sim
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from tqdm import tqdm
+import json
 
 launch_height = 0.5
 std_dev_vel = 0.5
@@ -15,6 +17,7 @@ y_bnds = (0, 8.069326)
 VEL_SAMPLES = 10
 ANGLE_SAMPLES = 10
 STDDEV_SAMPLES = 30
+POSITION_SAMPLES = 20
 
 def findBestShotNoSOTM(P_x, P_y):
     vels = []
@@ -33,7 +36,6 @@ def findBestShotNoSOTM(P_x, P_y):
                 vels.append(velocities)
                 angs.append(angle)
                 dists.append(dist)
-            print(str(j + ANGLE_SAMPLES*i + 1) + "/" + str(VEL_SAMPLES * ANGLE_SAMPLES))
 
     percents = []
 
@@ -58,10 +60,39 @@ def findBestShotNoSOTM(P_x, P_y):
     best_shot = [vels[max_index], angs[max_index]]
     return best_shot, heading, percents[max_index]
 
-shot, heading, prob = findBestShotNoSOTM(2, 2)
-ps, vs = sim.simulateShotDrag(shot[0], [2, 2, heading], shot[1], launch_height)
-print(prob)
-sim.meshcatVisualizeShot(np.array(ps), sim.TARGET_POSE)
+def convertDataToDictionary(positions, shots, headings, probs):
+    dict = {}
+    for i in range(len(positions)):
+        dict.update({positions[i] : [shots[i], headings[i], probs[i]]})
+    return dict
+
+P_x = 0
+P_y = 0
+
+positions = [] # [[P_x, P_y], [P_x, P_y]]
+shots = [] # [[vel, ang], [vel, ang]]
+headings = [] #[heading, heading]
+probs = [] # [percent, percent]
+
+for o in tqdm(range(POSITION_SAMPLES)):
+    P_x = ((x_bnds[1] - x_bnds[0])/POSITION_SAMPLES)*o + x_bnds[0]
+    for e in tqdm(range(POSITION_SAMPLES)):
+        P_y = ((y_bnds[1] - y_bnds[0])/POSITION_SAMPLES)*e + y_bnds[0]
+        positions.append((P_x, P_y))
+        shot, heading, prob = findBestShotNoSOTM(P_x, P_y)
+        shots.append(shot)
+        headings.append(heading)
+        probs.append(prob)
+
+dictionary = convertDataToDictionary(positions, shots, headings, probs)
+
+with open("data.json", "w") as json_file:
+    json.dump(dictionary, json_file, indent=4)
+
+
+#ps, vs = sim.simulateShotDrag(shot[0], [2, 2, heading], shot[1], launch_height)
+#print(prob)
+#sim.meshcatVisualizeShot(np.array(ps), sim.TARGET_POSE)
 
 """
 fig = plt.figure()
