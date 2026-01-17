@@ -6,6 +6,13 @@ import meshcat
 import meshcat.geometry as g
 import meshcat.transformations as tf
 
+from enum import Enum
+
+class Mode(Enum):
+    PLAIN = 1
+    DRAG = 2
+    DRAG_LIFT = 3
+
 G = 9.81
 RHO = 1.204
 CD = 0.47
@@ -25,6 +32,7 @@ TARGET_POSE = (4.6255 + OFFSET_X, 4.034536 + OFFSET_Y, 1.4336494314+0.4) # (x, y
 LAUNCH_SPEED = 12
 TOLERANCE = 0.3
 
+TIME_FROM_COMMAND_T0_SHOOT = 0.2
 
 HUB_PATH = "assets/hub.stl"
 
@@ -335,6 +343,10 @@ def getAveragePathVelocity(vel):
     for v in vel:
         total += np.linalg.norm(v)
     return total / len(vel)
+
+def populateProbabilitiesForShots(positions, optimal_states):
+    
+    pass
 # meshcatVisualizeHub(TARGET_POSE)
 """
 P_x = 6
@@ -350,7 +362,6 @@ print(findClosestPositionToTarget(pos))
 
 graphSimulatedShot(pos, TARGET_POSE)
 """
-
 """
 THIS IS AN EXAMPLE OF MESHCAT VISUALIZATION
 
