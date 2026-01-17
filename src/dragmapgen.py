@@ -9,7 +9,7 @@ launch_height = 0.5
 std_dev_vel = 0.5
 std_dev_angle = 1.5
 
-angle_bnds = (45, 75)
+angle_bnds = (45, 60)
 vel_bnds = (1, 20)
 x_bnds = (0, 3.685794)
 y_bnds = (0, 8.069326)
