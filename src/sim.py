@@ -17,9 +17,12 @@ MIN_LAUNCH_SPEED = 1
 MAX_LAUNCH_SPEED = 20
 DELTA_V = 0.25
 
-TARGET_POSE = (4.6255, 4.034536, 1.4336494314+0.2) # (x, y, z) x is the long side of the field, z is the height
+OFFSET_X = 0.0
+OFFSET_Y = 0.4
+TARGET_POSE = (4.6255 + OFFSET_X, 4.034536 + OFFSET_Y, 1.4336494314+0.3) # (x, y, z) x is the long side of the field, z is the height
 LAUNCH_SPEED = 12
 TOLERANCE = 0.5
+
 
 HUB_PATH = "src/assets/hub.stl"
 
@@ -196,7 +199,7 @@ def meshcatVisualizeShot(pos, target):
     target_sphere = g.Sphere(0.1)
 
     vis["hub"].set_object(g.StlMeshGeometry.from_file(HUB_PATH),  g.MeshLambertMaterial(color = 0x373b40,transparency= False))
-    vis["hub"].set_transform(tf.translation_matrix([3.6 + target[0], target[1], 0]))
+    vis["hub"].set_transform(tf.translation_matrix([3.6 + target[0] - OFFSET_X, target[1] - OFFSET_Y, 0]))
 
     vis["target"].set_object(target_sphere, g.MeshLambertMaterial(color=0xff0000))
     vis["target"].set_transform(tf.translation_matrix(target))
@@ -215,6 +218,46 @@ def meshcatVisualizeShot(pos, target):
 
     time.sleep(100)
 
+def meshcatVisualizeMultipleShots(positions, optimal_states, target):
+    vis = meshcat.Visualizer().open()
+    target_sphere = g.Sphere(0.1)
+
+    vis["hub"].set_object(g.StlMeshGeometry.from_file(HUB_PATH),  g.MeshLambertMaterial(color = 0x373b40,transparency= False))
+    vis["hub"].set_transform(tf.translation_matrix([3.6 + target[0] - OFFSET_X, target[1] - OFFSET_Y, 0]))
+    vis["target"].set_object(target_sphere, g.MeshLambertMaterial(color=0xff0000))
+    vis["target"].set_transform(tf.translation_matrix(target))
+
+    for i in range(len(positions)):
+        sphere = g.Sphere(0.05)
+        pos_x = float(positions[i][0])
+        pos_y = float(positions[i][1])
+        vis[f"projectile_{i}"].set_object(sphere, g.MeshLambertMaterial(color=0x00ff00))
+        vis[f"projectile_{i}"].set_transform(tf.translation_matrix([pos_y, pos_x, 0.5]))
+
+        p, v = simulateShotDrag(float(optimal_states[i][0][0]), [pos_y, pos_x, float(optimal_states[i][2])], float(optimal_states[i][0][1]), 0.5)
+        formatted_pose = np.zeros((3, len(p)), dtype=np.float32)
+        for f in range(len(p)):
+            formatted_pose[0, f] = p[f][0]
+            formatted_pose[1, f] = p[f][1]
+            formatted_pose[2, f] = p[f][2]
+
+        line_vertices = np.array(formatted_pose, dtype=np.float32)
+        vis[f'line_{i}'].set_object(g.Line(g.PointsGeometry(line_vertices)))
+
+    time.sleep(100)
+
+def meshcatVisualizeHub(target):
+    vis = meshcat.Visualizer().open()
+    target_sphere = g.Sphere(0.1)
+
+    vis["hub"].set_object(g.StlMeshGeometry.from_file(HUB_PATH),  g.MeshLambertMaterial(color = 0x373b40,transparency= False))
+    vis["hub"].set_transform(tf.translation_matrix([3.6 + target[0] - OFFSET_X, target[1] - OFFSET_Y, 0]))
+
+    vis["target"].set_object(target_sphere, g.MeshLambertMaterial(color=0xff0000))
+    vis["target"].set_transform(tf.translation_matrix(target))
+
+    time.sleep(100)
+
 def printNumpyArray(arr):
     with np.printoptions(precision=3, suppress=True):
         print(arr)
@@ -226,6 +269,8 @@ def getMaxHeight(pos):
         if p[2] > max:
             max = p[2]
     return max
+
+# meshcatVisualizeHub(TARGET_POSE)
 
 """
 THIS IS AN EXAMPLE OF MESHCAT VISUALIZATION

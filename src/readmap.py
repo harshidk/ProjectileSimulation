@@ -16,10 +16,13 @@ with open(FILE_NAME, 'r') as file:
     dictionary = json.load(file)
 
 keys = list(dictionary.keys())
+tuple_keys = []
+optimal_states = []
 
-print(convertKeyStringToTuple(keys[0]))
-optimum = dictionary[keys[0]]
-print(optimum)
+for k in keys:
+    if dictionary[k][0][0] != 0.0:
+        optimal_states.append(dictionary[k])
+        tuple_keys.append(convertKeyStringToTuple(k))
 
-p, v = sim.simulateShotDrag(optimum[0][0], [float(convertKeyStringToTuple(keys[0])[0]), float(convertKeyStringToTuple(keys[0])[1]), optimum[1]], optimum[0][1], 0.5)
-sim.meshcatVisualizeShot(p, sim.TARGET_POSE)
+print(optimal_states)
+# sim.meshcatVisualizeMultipleShots(tuple_keys, optimal_states, sim.TARGET_POSE)

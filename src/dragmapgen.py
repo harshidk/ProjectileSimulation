@@ -50,15 +50,19 @@ def findBestShotNoSOTM(P_x, P_y):
                 count+=1
         percents.append((count / STDDEV_SAMPLES) * 100)
 
-    max = 0
-    max_index = 0
-    for q in range(len(percents)):
-        if percents[q] > max:
-            max = percents[q]
-            max_index = q
+    if len(percents) != 0:
+        max = 0
+        max_index = 0
+        for q in range(len(percents)):
+            if percents[q] > max:
+                max = percents[q]
+                max_index = q
 
-    best_shot = [vels[max_index], angs[max_index]]
-    return best_shot, heading, percents[max_index]
+        best_shot = [vels[max_index], angs[max_index]]
+        return best_shot, heading, percents[max_index]
+    else:
+        print("No valid shots found at position: " + str(P_x) + ", " + str(P_y))
+        return [0,0], heading, 100.0
 
 def convertDataToDictionary(positions, shots, headings, probs):
     dict = {}
