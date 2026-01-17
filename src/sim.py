@@ -288,16 +288,6 @@ def getAveragePathVelocity(vel):
     return total / len(vel)
 # meshcatVisualizeHub(TARGET_POSE)
 
-P_x = 6
-P_y = 6
-launch_height = 0.5
-v_min = calculateMinimumVelocity(TARGET_POSE, [P_x, P_y, 0], launch_height) + 0.05
-
-heading, angle, dist, sqrt_term, y_d = calculateOptimalTrajectoriesNoDrag(TARGET_POSE, [P_x, P_y, launch_height], v_min)
-pos, vel = simulateShotDrag(v_min, [P_x, P_y, heading], angle, launch_height)
-
-print(getAveragePathVelocity(vel))
-
 """
 THIS IS AN EXAMPLE OF MESHCAT VISUALIZATION
 
