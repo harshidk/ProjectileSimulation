@@ -63,7 +63,7 @@ def findBestShotNoSOTM(P_x, P_y):
 def convertDataToDictionary(positions, shots, headings, probs):
     dict = {}
     for i in range(len(positions)):
-        dict.update({positions[i] : [shots[i], headings[i], probs[i]]})
+        dict[positions[i]] = [shots[i], headings[i], probs[i]]
     return dict
 
 P_x = 0
@@ -78,7 +78,8 @@ for o in tqdm(range(POSITION_SAMPLES)):
     P_x = ((x_bnds[1] - x_bnds[0])/POSITION_SAMPLES)*o + x_bnds[0]
     for e in tqdm(range(POSITION_SAMPLES)):
         P_y = ((y_bnds[1] - y_bnds[0])/POSITION_SAMPLES)*e + y_bnds[0]
-        positions.append((P_x, P_y))
+        p = (P_x, P_y)
+        positions.append(p)
         shot, heading, prob = findBestShotNoSOTM(P_x, P_y)
         shots.append(shot)
         headings.append(heading)
