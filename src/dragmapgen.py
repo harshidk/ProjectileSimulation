@@ -78,7 +78,7 @@ def findBestShotAverageVelocityNoSOTM(P_x, P_y):
         for j in range(ANGLE_SAMPLES):
             angle = float(((angle_bnds[1] - angle_bnds[0])/ANGLE_SAMPLES)*j + angle_bnds[0])
             headings = sim.calculateRequiredHeading(sim.TARGET_POSE, [P_x, P_y, 0])
-            poses, e = sim.simulateShotDragLift(velocities, [P_x, P_y, headings], angle, launch_height)
+            poses, e = sim.simulateShotDrag(velocities, [P_x, P_y, headings], angle, launch_height)
             avg_vel = sim.getAveragePathVelocity(e)
             dist, x, y = sim.findClosestZToTarget(poses, np.array(sim.TARGET_POSE))
             if dist < sim.TOLERANCE and sim.getMaxHeight(poses) < MAX_HEIGHT:
