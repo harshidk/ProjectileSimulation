@@ -72,9 +72,6 @@ def advanceNextStateDragLift(v, p, dt):
     lift_dir = np.cross(v_dir, i)/np.linalg.norm(np.cross(v_dir, i))
 
     lift = lift_mag * lift_dir
-    print(lift_dir)
-    print(v_dir)
-    print(drag_dir)
 
     a_g = np.array([0, 0, -G])
     a = a_g + drag + lift
