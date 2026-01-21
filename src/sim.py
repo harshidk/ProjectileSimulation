@@ -26,7 +26,7 @@ DELTA_V = 0.25
 BACKSPIN_SPEED = 3 # rad/s counterclockwise
 Cl = 0.5
 
-OFFSET_X = 0.30
+OFFSET_X = 0.0 #0.3
 OFFSET_Y = 0.0
 TARGET_POSE = (4.6255 + OFFSET_X, 4.034536 + OFFSET_Y, 1.4336494314+0.4) # (x, y, z) x is the long side of the field, z is the height
 LAUNCH_SPEED = 12
