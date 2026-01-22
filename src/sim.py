@@ -280,7 +280,7 @@ def meshcatVisualizeShot(pos, target):
     line_vertices = np.array(formatted_pose, dtype=np.float32)
     vis['line'].set_object(g.Line(g.PointsGeometry(line_vertices)))
 
-    time.sleep(100)
+    time.sleep(1)
 
 def meshcatVisualizeMultipleShots(positions, optimal_states, target):
     vis = meshcat.Visualizer().open()
@@ -308,7 +308,7 @@ def meshcatVisualizeMultipleShots(positions, optimal_states, target):
         line_vertices = np.array(formatted_pose, dtype=np.float32)
         vis[f'line_{i}'].set_object(g.Line(g.PointsGeometry(line_vertices)))
 
-    time.sleep(100)
+    time.sleep(1)
 
 def meshcatVisualizeHub(target):
     vis = meshcat.Visualizer().open()
@@ -320,7 +320,7 @@ def meshcatVisualizeHub(target):
     vis["target"].set_object(target_sphere, g.MeshLambertMaterial(color=0xff0000))
     vis["target"].set_transform(tf.translation_matrix(target))
 
-    time.sleep(100)
+    time.sleep(1)
 
 def printNumpyArray(arr):
     with np.printoptions(precision=3, suppress=True):

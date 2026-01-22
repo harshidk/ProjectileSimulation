@@ -25,7 +25,7 @@ for k in keys:
         tuple_keys.append(convertKeyStringToTuple(k))
 
 # print(optimal_states)
-#sim.meshcatVisualizeMultipleShots(tuple_keys, optimal_states, sim.TARGET_POSE)
+# sim.meshcatVisualizeMultipleShots(tuple_keys, optimal_states, sim.TARGET_POSE)
 
 def getNumpyArrayPositions():
     array = []
